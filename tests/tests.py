@@ -28,25 +28,53 @@ class DiffTestCase(TestCase):
         self.assertEqual(result, expected)
 
 
-class UnflattenTestCase(TestCase):
-    def test_empty_string(self):
-        result = unflatten('')
-        self.assertEqual(result, '')
+class AutoTestCase(TestCase):
+    @classmethod
+    def create(cls, spec):
+        def check_assert_equal(self):
+            input, output = spec
+            result = self.function_under_test(input)
+            self.assertEqual(result, output)
+        return check_assert_equal
 
-    def test_single_element(self):
-        tree = [
-            ['a'],
-        ]
-        result = unflatten(tree)
-        self.assertEqual(result, '<a />')
+    @classmethod
+    def generate(cls):
+        for i, spec in enumerate(cls.cases):
+            test_method = cls.create(spec)
+            name = str('test_expected_%d' % i)
+            test_method.__name__ = name
+            setattr(cls, name, test_method)
 
-    def test_single_element_with_text(self):
-        tree = [
-            ['a'],
-            ['a', '!foo'],
-        ]
-        result = unflatten(tree)
-        self.assertEqual(result, '<a>foo</a>')
+
+class UnflattenTestCase(AutoTestCase):
+    function_under_test = lambda s, *args, **kwargs: unflatten(*args, **kwargs)
+
+    cases = (
+        ('', ''),
+        (
+            [
+                ['a'],
+            ],
+            '<a />',
+        ),
+        (
+            [
+                ['a'],
+                ['a', '!foo'],
+            ],
+            '<a>foo</a>'
+        ),
+        (
+            [
+                ['a'],
+                ['a', 'b'],
+                ['a', 'b', '!foo'],
+            ],
+            '<a><b>foo</b></a>'
+        ),
+    )
+
+UnflattenTestCase.generate()
 
 
 class FlattenXmlTreeFromStringTestCase(TestCase):
