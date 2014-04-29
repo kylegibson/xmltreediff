@@ -8,6 +8,7 @@ from unittest import TestCase
 from xmltreediff.diff import (
     diff,
     flatten_xml_from_string,
+    unflatten,
 )
 
 
@@ -25,6 +26,27 @@ class DiffTestCase(TestCase):
         result = diff(a, b)
         expected = '<a><p>foo</p><ins><p>bar</p></ins></a>'
         self.assertEqual(result, expected)
+
+
+class UnflattenTestCase(TestCase):
+    def test_empty_string(self):
+        result = unflatten('')
+        self.assertEqual(result, '')
+
+    def test_single_element(self):
+        tree = [
+            ['a'],
+        ]
+        result = unflatten(tree)
+        self.assertEqual(result, '<a />')
+
+    def test_single_element_with_text(self):
+        tree = [
+            ['a'],
+            ['a', '!foo'],
+        ]
+        result = unflatten(tree)
+        self.assertEqual(result, '<a>foo</a>')
 
 
 class FlattenXmlTreeFromStringTestCase(TestCase):
