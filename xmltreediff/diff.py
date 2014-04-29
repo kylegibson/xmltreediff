@@ -17,6 +17,36 @@ def flatten_xml_from_string(xml_data):
     return flatten_xml_tree([tree])
 
 
+def unflatten(tree):
+    if not tree:
+        return ''
+
+    root_element = None
+    previous_path = None
+    element_stack = []
+    current_element = None
+    for row in tree:
+        path = []
+        text = ''
+        for column in row:
+            if column[0] == '!':
+                text = column[1:]
+            else:
+                path.append(column)
+        if current_element is None:
+            current_element = cElementTree.Element(path[-1])
+            element_stack.append(current_element)
+        if current_element is not None and path == previous_path:
+            if text:
+                current_element.text = text
+        previous_path = path
+        if root_element is None:
+            root_element = current_element
+    if root_element is None:
+        return ''
+    return cElementTree.tostring(root_element)
+
+
 def flatten_xml_tree(xml_tree_iterable, element_factory=None):
     if element_factory is None:
         element_factory = default_element_factory
