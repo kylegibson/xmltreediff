@@ -60,6 +60,11 @@ def unflatten(tree):
             builder.end(tag_to_end)
             paths.pop()
 
+        last_path = paths[-1] if paths else []
+        if not data and current_path == last_path:
+            builder.end(tag_to_end)
+            paths.pop()
+
         tag = current_path[-1]
         if create_new_element:
             builder.start(tag)
