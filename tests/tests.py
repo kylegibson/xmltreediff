@@ -12,22 +12,6 @@ from xmltreediff.diff import (
 )
 
 
-class DiffTestCase(TestCase):
-    def test_text_changed(self):
-        a = '<p>foo</p>'
-        b = '<p>bar</p>'
-        result = diff(a, b)
-        expected = '<p><del>foo</del><ins>bar</ins></p>'
-        self.assertEqual(result, expected)
-
-    def test_new_node(self):
-        a = '<a><p>foo</p></a>'
-        b = '<a><p>foo</p><p>bar</p></a>'
-        result = diff(a, b)
-        expected = '<a><p>foo</p><ins><p>bar</p></ins></a>'
-        self.assertEqual(result, expected)
-
-
 class AutoTestCase(TestCase):
     @classmethod
     def create(cls, spec):
@@ -54,6 +38,37 @@ Input: %s
             name = str('test_expected_%d' % i)
             test_method.__name__ = name
             setattr(cls, name, test_method)
+
+
+class DiffTestCase(AutoTestCase):
+    function_under_test = diff
+
+    cases = (
+        (
+            dict(
+                before='<p></p>',
+                after='<p>foo</p>',
+            ),
+            '<p><ins>foo</ins></p>',
+        ),
+        (
+            dict(
+                before='<p>foo</p>',
+                after='<p>bar</p>',
+            ),
+            '<p><del>foo</del><ins>bar</ins></p>',
+        ),
+        (
+            dict(
+                before='<a><p>foo</p></a>',
+                after='<a><p>foo</p><p>bar</p></a>',
+            ),
+            '<a><p>foo</p><ins><p>bar</p></ins></a>',
+        ),
+    )
+
+
+DiffTestCase.generate()
 
 
 class UnflattenTestCase(AutoTestCase):
