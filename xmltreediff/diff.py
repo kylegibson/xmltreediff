@@ -18,30 +18,60 @@ def flatten_xml_from_string(xml_data):
 
 
 def unflatten(tree):
+    builder = cElementTree.TreeBuilder()
+
     if not tree:
         return ''
 
+    tag = None
     root_element = None
-    previous_path = None
-    element_stack = []
-    current_element = None
+    paths = []
     for row in tree:
-        path = []
-        text = ''
+        current_path = []
+        data = ''
+        create_new_element = True
         for column in row:
             if column[0] == '!':
-                text = column[1:]
+                create_new_element = False
+                data = column[1:]
             else:
-                path.append(column)
-        if current_element is None:
-            current_element = cElementTree.Element(path[-1])
-            element_stack.append(current_element)
-        if current_element is not None and path == previous_path:
-            if text:
-                current_element.text = text
-        previous_path = path
-        if root_element is None:
-            root_element = current_element
+                current_path.append(column)
+
+        tags_to_end = []
+
+        last_path = paths[-1] if paths else []
+
+        if not data and current_path == last_path:
+            tags_to_end.append(tag)
+
+        for i, a in enumerate(last_path):
+            tag_to_end = None
+            if i >= len(current_path):
+                tag_to_end = a
+            else:
+                b = current_path[i]
+                if a == b:
+                    continue
+                else:
+                    tag_to_end = a
+            tags_to_end.append(tag_to_end)
+
+        for tag_to_end in tags_to_end[::-1]:
+            builder.end(tag_to_end)
+            paths.pop()
+
+        tag = current_path[-1]
+        if create_new_element:
+            builder.start(tag)
+
+        if data:
+            builder.data(data)
+
+        paths.append(current_path)
+
+    builder.end(tag)
+
+    root_element = builder.close()
     if root_element is None:
         return ''
     return cElementTree.tostring(root_element)
