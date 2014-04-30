@@ -6,10 +6,6 @@ from __future__ import (
 from xml.etree import cElementTree
 
 
-def default_element_factory(**kwargs):
-    pass
-
-
 def flatten_xml_from_string(xml_data):
     if not xml_data:
         return ''
@@ -82,10 +78,7 @@ def unflatten(tree):
     return cElementTree.tostring(root_element)
 
 
-def flatten_xml_tree(xml_tree_iterable, element_factory=None):
-    if element_factory is None:
-        element_factory = default_element_factory
-
+def flatten_xml_tree(xml_tree_iterable):
     # Preserve the parent iter, parent item and the parent's child stack
     stack = []
 
