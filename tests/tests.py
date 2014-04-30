@@ -76,6 +76,23 @@ class UnflattenTestCase(AutoTestCase):
         (
             [
                 ['a'],
+                ['a', '!foo'],
+                ['a', 'b'],
+            ],
+            '<a>foo<b /></a>'
+        ),
+        (
+            [
+                ['a'],
+                ['a', '!foo'],
+                ['a', 'b'],
+                ['a', 'b', '!bar'],
+            ],
+            '<a>foo<b>bar</b></a>'
+        ),
+        (
+            [
+                ['a'],
                 ['a', 'b'],
                 ['a', 'b', '!foo'],
             ],
@@ -106,6 +123,16 @@ class UnflattenTestCase(AutoTestCase):
                 ['a', 'c'],
             ],
             '<a><b><c /></b><c /></a>',
+        ),
+        (
+            [
+                ['a'],
+                ['a', 'b'],
+                ['a', 'b', 'c'],
+                ['a', 'b', 'c', 'd'],
+                ['a', '!foo'],
+            ],
+            '<a><b><c><d /></c></b>foo</a>',
         ),
         (
             [
