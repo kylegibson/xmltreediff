@@ -47,11 +47,10 @@ def unflatten(tree):
                 tag_to_end = a
             else:
                 b = current_path[i]
-                if a == b:
-                    continue
-                else:
+                if a != b:
                     tag_to_end = a
-            tags_to_end.append(tag_to_end)
+            if tag_to_end:
+                tags_to_end.append(tag_to_end)
 
         for tag_to_end in tags_to_end[::-1]:
             builder.end(tag_to_end)
