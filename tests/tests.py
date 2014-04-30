@@ -32,9 +32,18 @@ class AutoTestCase(TestCase):
     @classmethod
     def create(cls, spec):
         def check_assert_equal(self):
-            input, output = spec
+            input, expected = spec
             result = self.function_under_test(input)
-            self.assertEqual(result, output)
+            if result != expected:
+                raise AssertionError('''
+Result: %s
+Expected: %s
+Input: %s
+                ''' % (
+                    result,
+                    expected,
+                    input,
+                ))
         return check_assert_equal
 
     @classmethod
