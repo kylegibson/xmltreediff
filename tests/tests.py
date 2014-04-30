@@ -32,8 +32,9 @@ class AutoTestCase(TestCase):
     @classmethod
     def create(cls, spec):
         def check_assert_equal(self):
-            input, expected = spec
-            result = self.function_under_test(input)
+            kwargs, expected = spec
+            func = getattr(type(self), 'function_under_test', None)
+            result = func(**kwargs)
             if result != expected:
                 raise AssertionError('''
 Result: %s
@@ -42,7 +43,7 @@ Input: %s
                 ''' % (
                     result,
                     expected,
-                    input,
+                    kwargs,
                 ))
         return check_assert_equal
 
@@ -56,91 +57,94 @@ Input: %s
 
 
 class UnflattenTestCase(AutoTestCase):
-    function_under_test = lambda s, *args, **kwargs: unflatten(*args, **kwargs)
+    function_under_test = unflatten
 
     cases = (
-        ('', ''),
         (
-            [
-                ['a'],
-            ],
-            '<a />',
+            dict(tree=''),
+            '',
         ),
         (
-            [
+            dict(tree=[
+                ['a'],
+            ]),
+            b'<a />',
+        ),
+        (
+            dict(tree=[
                 ['a'],
                 ['a', '!foo'],
-            ],
-            '<a>foo</a>'
+            ]),
+            b'<a>foo</a>'
         ),
         (
-            [
+            dict(tree=[
                 ['a'],
                 ['a', '!foo'],
                 ['a', 'b'],
-            ],
-            '<a>foo<b /></a>'
+            ]),
+            b'<a>foo<b /></a>'
         ),
         (
-            [
+            dict(tree=[
                 ['a'],
                 ['a', '!foo'],
                 ['a', 'b'],
                 ['a', 'b', '!bar'],
-            ],
-            '<a>foo<b>bar</b></a>'
+            ]),
+            b'<a>foo<b>bar</b></a>'
         ),
         (
-            [
+            dict(tree=[
                 ['a'],
                 ['a', 'b'],
                 ['a', 'b', '!foo'],
-            ],
-            '<a><b>foo</b></a>'
+            ]),
+            b'<a><b>foo</b></a>'
         ),
         (
-            [
+            dict(tree=[
                 ['a'],
                 ['a', 'b'],
                 ['a', 'b'],
-            ],
-            '<a><b /><b /></a>',
+            ]),
+            b'<a><b /><b /></a>',
         ),
         (
-            [
+            dict(tree=[
                 ['a'],
                 ['a', 'b'],
                 ['a', 'b', 'c'],
                 ['a', 'b'],
-            ],
-            '<a><b><c /></b><b /></a>',
+            ]),
+            b'<a><b><c /></b><b /></a>',
         ),
         (
-            [
+            dict(tree=[
                 ['a'],
                 ['a', 'b'],
                 ['a', 'b', 'c'],
                 ['a', 'c'],
-            ],
-            '<a><b><c /></b><c /></a>',
+            ]),
+            b'<a><b><c /></b><c /></a>',
         ),
         (
-            [
+            dict(tree=[
                 ['a'],
                 ['a', 'b'],
                 ['a', 'b', 'c'],
                 ['a', 'b', 'c', 'd'],
                 ['a', '!foo'],
-            ],
-            '<a><b><c><d /></c></b>foo</a>',
+            ]),
+            b'<a><b><c><d /></c></b>foo</a>',
         ),
         (
-            [
+            dict(tree=[
                 ['a'],
                 ['a', 'b'],
                 ['a', '!foo'],
-            ],
-            '<a><b />foo</a>',
+            ]),
+            b'<a><b />foo</a>',
         ),
     )
 
