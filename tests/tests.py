@@ -50,21 +50,21 @@ class DiffTestCase(AutoTestCase):
                 before='<p></p>',
                 after='<p>foo</p>',
             ),
-            '<p><ins>foo</ins></p>',
+            b'<p><ins>foo</ins></p>',
         ),
         (
             dict(
                 before='<p>foo</p>',
                 after='<p>bar</p>',
             ),
-            '<p><del>foo</del><ins>bar</ins></p>',
+            b'<p><del>foo</del><ins>bar</ins></p>',
         ),
         (
             dict(
                 before='<a><p>foo</p></a>',
                 after='<a><p>foo</p><p>bar</p></a>',
             ),
-            '<a><p>foo</p><ins><p>bar</p></ins></a>',
+            b'<a><p>foo</p><ins><p>bar</p></ins></a>',
         ),
     )
 
