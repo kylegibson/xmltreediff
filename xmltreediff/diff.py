@@ -4,6 +4,7 @@ from __future__ import (
     unicode_literals,
 )
 
+import difflib
 from xml.etree import cElementTree
 
 
@@ -124,9 +125,22 @@ def flatten_xml_tree(xml_tree_iterable):
     return paths
 
 
-def diff(a, b):
-    a_flatten = flatten_xml_from_string(a)
-    b_flatten = flatten_xml_from_string(b)
-    print a_flatten
-    print b_flatten
-    return b
+def diff(before, after):
+    before = [' '.join(row) for row in flatten_xml_from_string(before)]
+    after = [' '.join(row) for row in flatten_xml_from_string(after)]
+    difference = []
+    delta = list(difflib.ndiff(before, after))
+    mode_map = {'+': 'ins', '-': 'del'}
+    for row in delta:
+        cells = row.split()
+        current_mode = cells[0]
+        if current_mode in mode_map:
+            cells.pop(0)
+            last_item = cells.pop()
+            cells.append(mode_map.get(current_mode))
+            difference.append(list(cells))
+            cells.append(last_item)
+            difference.append(list(cells))
+        else:
+            difference.append(cells)
+    return unflatten(difference)
