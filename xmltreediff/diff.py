@@ -130,17 +130,27 @@ def diff(before, after):
     after = [' '.join(row) for row in flatten_xml_from_string(after)]
     difference = []
     delta = list(difflib.ndiff(before, after))
+    previous_mode = None
+    mode_index = None
     mode_map = {'+': 'ins', '-': 'del'}
     for row in delta:
         cells = row.split()
         current_mode = cells[0]
         if current_mode in mode_map:
             cells.pop(0)
-            last_item = cells.pop()
-            cells.append(mode_map.get(current_mode))
-            difference.append(list(cells))
-            cells.append(last_item)
-            difference.append(list(cells))
+            if mode_index is None or current_mode != previous_mode:
+                mode_index = len(cells) - 1
+                mode_tag = mode_map.get(current_mode)
+                last_item = cells[-1]
+                cells[-1] = mode_tag
+                difference.append(list(cells))
+                cells.append(last_item)
+            else:
+                cells.insert(mode_index, mode_map.get(current_mode))
+            difference.append(cells)
+            previous_mode = current_mode
         else:
+            previous_mode = None
+            mode_index = None
             difference.append(cells)
     return unflatten(difference)
