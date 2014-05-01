@@ -47,6 +47,20 @@ class DiffTestCase(AutoTestCase):
     cases = (
         (
             dict(
+                before='',
+                after='<a></a>',
+            ),
+            b'<ins><a /></ins>',
+        ),
+        (
+            dict(
+                before='<a></a>',
+                after='<a></a>',
+            ),
+            b'<a></a>',
+        ),
+        (
+            dict(
                 before='<a></a>',
                 after='<a>foo</a>',
             ),
