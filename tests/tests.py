@@ -87,6 +87,34 @@ class DiffTestCase(AutoTestCase):
             ),
             b'<a><b>foo</b><ins><b>bar</b></ins></a>',
         ),
+        (
+            dict(
+                before='<a>foo</a>',
+                after='<a><b>bar</b>foo</a>',
+            ),
+            b'<a><ins><b>bar</b></ins>foo</a>',
+        ),
+        (
+            dict(
+                before='<a><b>foo</b></a>',
+                after='<a><c>foo</c></a>',
+            ),
+            b'<a><del><b>foo</b></del><ins><c>foo</c></ins></a>',
+        ),
+        (
+            dict(
+                before='<a>one three</a>',
+                after='<a>one two three</a>'
+            ),
+            b'<a>one <ins>two </ins>three</a>',
+        ),
+        (
+            dict(
+                before='<a>one two three</a>',
+                after='<a>one three</a>'
+            ),
+            b'<a>one <del>two </del>three</a>',
+        ),
     )
 
 
