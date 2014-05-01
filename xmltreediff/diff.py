@@ -126,6 +126,8 @@ def flatten_xml_tree(xml_tree_iterable):
 
 
 def diff(before, after):
+    if before == after:
+        return before
     before = [' '.join(row) for row in flatten_xml_from_string(before)]
     after = [' '.join(row) for row in flatten_xml_from_string(after)]
     difference = []
